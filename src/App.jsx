@@ -5,20 +5,20 @@ import "./App.css";
 const URL_PATH = "https://pokeapi.co/api/v2/pokemon/";
 
 const App = () => {
-  const [word, setWord] = useState();
   const [results, setResults] = useState();
 
-  useEffect(() => {
-    word &&
-      fetch(URL_PATH)
-        .then((result) => result.json())
-        .then((data) => changeHandler(data.results, word));
-  }, [word]);
-
-  // useEffect(() => {
-  //   results &&
-  //   renderPokes()
-  // }, [results]);
+  const fetchData = (value) => {
+    value.length > 0
+      ? fetch(URL_PATH)
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            const filteredData = changeHandler(data.results, value);
+            setResults(filteredData);
+          })
+      : setResults();
+  };
 
   const changeHandler = (data, word) => {
     let resultadosFitrados = [];
@@ -28,13 +28,11 @@ const App = () => {
       if (nombreMin.indexOf(textoMin) === 0) {
         resultadosFitrados.push(res);
       }
-      setResults(resultadosFitrados);
     });
+    return resultadosFitrados;
   };
 
   const renderPokes = () => {
-    console.log(results);
-    results && console.log(results.length);
     return results ? (
       results.map((item, index) => (
         <li key={index}>
@@ -55,7 +53,7 @@ const App = () => {
           <h1 className="no-results">No results</h1>
         </div>
       </li>
-    )
+    );
   };
 
   return (
@@ -69,13 +67,11 @@ const App = () => {
         className="input"
         placeholder="Pokemon or type"
         onChange={(ev) => {
-          setWord(ev.target.value);
+          fetchData(ev.target.value);
         }}
       />
       <div className="loader"></div>
-      <ul className="suggestions">
-        {renderPokes()}
-      </ul>
+      <ul className="suggestions">{renderPokes()}</ul>
     </>
   );
 };
