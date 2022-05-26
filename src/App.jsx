@@ -1,36 +1,83 @@
-import React from 'react';
-import './App.css';
+import React from "react";
+import { useState, useEffect } from "react";
+import "./App.css";
 
-const URL_PATH = "https://gist.githubusercontent.com/bar0191/fae6084225b608f25e98b733864a102b/raw/dea83ea9cf4a8a6022bfc89a8ae8df5ab05b6dcc/pokemon.json";
+const URL_PATH = "https://pokeapi.co/api/v2/pokemon/";
 
-const App = () => <>
-    <label htmlFor="maxCP" className="max-cp">
+const App = () => {
+  const [word, setWord] = useState();
+  const [results, setResults] = useState();
+
+  useEffect(() => {
+    word &&
+      fetch(URL_PATH)
+        .then((result) => result.json())
+        .then((data) => changeHandler(data.results, word));
+  }, [word]);
+
+  // useEffect(() => {
+  //   results &&
+  //   renderPokes()
+  // }, [results]);
+
+  const changeHandler = (data, word) => {
+    let resultadosFitrados = [];
+    data.forEach((res) => {
+      let nombreMin = res.name.toLowerCase();
+      let textoMin = word.toLowerCase();
+      if (nombreMin.indexOf(textoMin) === 0) {
+        resultadosFitrados.push(res);
+      }
+      setResults(resultadosFitrados);
+    });
+  };
+
+  const renderPokes = () => {
+    console.log(results);
+    results && console.log(results.length);
+    return results ? (
+      results.map((item, index) => (
+        <li key={index}>
+          <div className="info">
+            <h1>
+              <span className="hl">{item.name}</span>
+            </h1>
+          </div>
+        </li>
+      ))
+    ) : (
+      <li>
+        <img
+          src="https://cyndiquil721.files.wordpress.com/2014/02/missingno.png"
+          alt=""
+        />
+        <div className="info">
+          <h1 className="no-results">No results</h1>
+        </div>
+      </li>
+    )
+  };
+
+  return (
+    <>
+      <label htmlFor="maxCP" className="max-cp">
         <input type="checkbox" id="maxCP" />
-        <small>
-            Maximum Combat Points
-        </small>
-    </label>
-    <input type="text" className="input" placeholder="Pokemon or type" />
-    <div className="loader"></div>
-    <ul className="suggestions">
-        <li>
-            <img src="http://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png" alt="" />
-            <div className="info">
-                <h1>
-                    <span className="hl">Pika</span>chu</h1>
-                <span className="type electric">Electric</span>
-                <span className="type normal">Normal</span>
-            </div>
-        </li>
-        <li>
-            <img src="https://cyndiquil721.files.wordpress.com/2014/02/missingno.png" alt="" />
-            <div className="info">
-                <h1 className="no-results">
-                    No results
-                </h1>
-            </div>
-        </li>
-    </ul>
-</>;
+        <small>Maximum Combat Points</small>
+      </label>
+      <input
+        type="text"
+        className="input"
+        placeholder="Pokemon or type"
+        onChange={(ev) => {
+          setWord(ev.target.value);
+        }}
+      />
+      <div className="loader"></div>
+      <ul className="suggestions">
+        {renderPokes()}
+      </ul>
+    </>
+  );
+};
 
 export default App;
