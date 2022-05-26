@@ -1,24 +1,37 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import "./App.css";
+import React from 'react';
+import { useState, useEffect } from 'react';
+import './App.css';
 
-const URL_PATH = "https://pokeapi.co/api/v2/pokemon/";
+const URL_PATH = 'https://pokeapi.co/api/v2/pokemon/';
 
 const App = () => {
   const [results, setResults] = useState();
 
-  const fetchData = (value) => {
-    value.length > 0
-      ? fetch(URL_PATH)
-          .then((response) => {
-            return response.json();
-          })
-          .then((data) => {
-            const filteredData = changeHandler(data.results, value);
-            setResults(filteredData);
-          })
-      : setResults();
-  };
+  async function fetchDataB() {
+    let response = await fetch(URL_PATH);
+    let data = response.json();
+    return data;
+  }
+
+  async function handleChange(value) {
+    let response = await fetchDataB();
+    const filteredData = changeHandler(response.results, value);
+    console.log(filteredData.length);
+    value.length > 0 ? setResults(filteredData) : setResults();
+  }
+
+  // const fetchData = (value) => {
+  //   value.length > 0
+  //     ? fetch(URL_PATH)
+  //         .then((response) => {
+  //           return response.json();
+  //         })
+  //         .then((data) => {
+  //           const filteredData = changeHandler(data.results, value);
+  //           setResults(filteredData);
+  //         })
+  //     : setResults();
+  // };
 
   const changeHandler = (data, word) => {
     let resultadosFitrados = [];
@@ -36,9 +49,9 @@ const App = () => {
     return results ? (
       results.map((item, index) => (
         <li key={index}>
-          <div className="info">
+          <div className='info'>
             <h1>
-              <span className="hl">{item.name}</span>
+              <span className='hl'>{item.name}</span>
             </h1>
           </div>
         </li>
@@ -46,11 +59,11 @@ const App = () => {
     ) : (
       <li>
         <img
-          src="https://cyndiquil721.files.wordpress.com/2014/02/missingno.png"
-          alt=""
+          src='https://cyndiquil721.files.wordpress.com/2014/02/missingno.png'
+          alt=''
         />
-        <div className="info">
-          <h1 className="no-results">No results</h1>
+        <div className='info'>
+          <h1 className='no-results'>No results</h1>
         </div>
       </li>
     );
@@ -58,20 +71,21 @@ const App = () => {
 
   return (
     <>
-      <label htmlFor="maxCP" className="max-cp">
-        <input type="checkbox" id="maxCP" />
+      <label htmlFor='maxCP' className='max-cp'>
+        <input type='checkbox' id='maxCP' />
         <small>Maximum Combat Points</small>
       </label>
       <input
-        type="text"
-        className="input"
-        placeholder="Pokemon or type"
+        type='text'
+        className='input'
+        placeholder='Pokemon or type'
         onChange={(ev) => {
-          fetchData(ev.target.value);
+          // fetchData(ev.target.value);
+          handleChange(ev.target.value);
         }}
       />
-      <div className="loader"></div>
-      <ul className="suggestions">{renderPokes()}</ul>
+      <div className='loader'></div>
+      <ul className='suggestions'>{renderPokes()}</ul>
     </>
   );
 };
